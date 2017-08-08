@@ -113,32 +113,30 @@ def _Run(model, session, dataloader, cfg):
     #df = df[columns]
     return df
 
-    # validate accuracy performance on classification task
-def ValidateACC(model, session, dataloader, is_print=True):
-    acc = AverageMeter()
-    softmax = AverageMeter()
-    center = AverageMeter()
-    reg = AverageMeter()
-    total = AverageMeter()
-    for imgs, _, labels in dataloader:
-        size = imgs.shape[0]
-        feed = {model.pl_images:imgs, model.pl_labels:labels, model.pl_phase:True}
-        target = [model.accuracy, model.loss_softmax, model.loss_center, model.loss_reg]
-        v_acc, v_soft, v_center, v_reg = session.run(target, feed_dict=feed)
-        acc.update(v_acc, size)
-        softmax.update(v_soft, size)
-        center.update(v_center, size)
-        reg.update(v_reg, size)
-        total.update(v_soft + v_center + v_reg, size)
-    
-    if is_print:
-        print('---------- validation on testing data ----------')
-        info = 'acc:{0:6.3f}  softmax:{1:6.3f}  center:{2:6.3f}  reg:{3:6.3f}  total:{4:6.3f}'
-        print(info.format(acc.avg, softmax.avg, center.avg, reg.avg, total.avg))
-        print('\n\n')
-        
-    return acc.avg
-
+def TrainModel(cfg, dataloader):
+    g = tf.Graph()
+    with g.as_default():
+        np.random.seed(seed=cfg.tr.seed)
+        random.seed(cfg.tr.seed)
+        tf.set_random_seed(cfg.tr.seed)
+        model = Inception_Res_V1(cfg=cfg.model)
+        session_cfg =tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
+        session = tf.Session(config=session_cfg)
+  
+        if cfg.sl.is_load:
+            print('begin to load model from file')
+            ckpt = tf.train.get_checkpoint_state(cfg.sl.load_dir)
+            assert ckpt and ckpt.model_checkpoint_path, 'unable to load checkpoint'
+            model.saver.restore(session, ckpt.model_checkpoint_path)
+            print('model sucessfully loaded')
+        else:
+            print('begin to generate a new model, the model will be trained from scratch')
+            session.run(model.op_init)
+            print('model sucessfully created')
+            
+        info = _Run(model, session, dataloader, cfg)
+        session.close()
+    return info
 
 def _SetCfg(cfg):
     cfg.SetArgs(cfg.model, reg=0.00005, optimizer='adam', loss_method='softmax')
