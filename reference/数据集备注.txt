@@ -1,0 +1,6 @@
+Dataset			#Subjects		#Images		Availability
+CASIA-WebFace	10,575			494,414		Public
+MS-Celeb-1M		100,000			10,000,000	Public
+
+CASIA-WebFace:	http://www.cbsr.ia.ac.cn/english/CASIA-WebFace-Database.html
+MS-Celeb-1M:	http://www.msceleb.org/
