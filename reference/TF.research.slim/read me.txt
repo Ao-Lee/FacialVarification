@@ -1,0 +1,10 @@
+tensorflow.research.slim
+关于slim的文档:    
+https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/framework/python/ops/arg_scope.py    
+slim中网络的接口和tf.contrib.layers中相同，具体参数可以参考
+https://www.tensorflow.org/api_docs/python/tf/contrib/layers/
+
+https://github.com/tensorflow/models/tree/master/research/slim
+https://github.com/tensorflow/models/blob/master/research/slim/preprocessing/inception_preprocessing.py
+https://github.com/tensorflow/models/blob/master/research/slim/preprocessing/preprocessing_factory.py
+https://github.com/tensorflow/models/tree/master/research
